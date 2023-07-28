@@ -1,0 +1,251 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1251"> 
+  <title>Coverage Report > MainKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">&lt;empty package name&gt;</a>
+</div>
+
+<h1>Coverage Summary for Class: MainKt (&lt;empty package name&gt;)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MainKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;data class Post(
+&nbsp;    val id: Int,
+&nbsp;    val date: Int,
+&nbsp;    val text: String,
+&nbsp;    val comments: Comments,
+&nbsp;    val copyright: Copyright,
+&nbsp;    val likes: Likes,
+&nbsp;    val reposts: Reposts,
+&nbsp;    val views: Views
+&nbsp;)
+&nbsp;
+&nbsp;data class Comments(
+&nbsp;    val count: Int,
+&nbsp;    val can_post: Int,
+&nbsp;    val groups_can_post: Boolean,
+&nbsp;    val can_close: Boolean,
+&nbsp;    val can_open: Boolean
+&nbsp;)
+&nbsp;
+&nbsp;data class Copyright(
+&nbsp;    val id: Int,
+&nbsp;    val link: String?,
+&nbsp;    val name: String?,
+&nbsp;    val type: String?
+&nbsp;)
+&nbsp;
+&nbsp;data class Likes(
+&nbsp;    val count: Int,
+&nbsp;    val user_likes: Int,
+&nbsp;    val can_like: Int,
+&nbsp;    val can_publish: Int
+&nbsp;)
+&nbsp;
+&nbsp;data class Reposts(
+&nbsp;    val count: Int,
+&nbsp;    val user_reposted: Int
+&nbsp;)
+&nbsp;
+&nbsp;data class Views(
+&nbsp;    val count: Int
+&nbsp;)
+&nbsp;
+&nbsp;class WallService {
+&nbsp;    private val posts = mutableListOf&lt;Post&gt;()
+&nbsp;
+&nbsp;    fun addPost(post: Post): Post {
+&nbsp;        val newPost = post.copy(id = if (posts.isEmpty()) 1 else posts.maxByOrNull { it.id }!!.id + 1)
+&nbsp;        posts.add(newPost)
+&nbsp;        return newPost
+&nbsp;    }
+&nbsp;
+&nbsp;    fun updatePost(post: Post): Boolean {
+&nbsp;        val existingPost = posts.find { it.id == post.id }
+&nbsp;        return if (existingPost != null) {
+&nbsp;            val index = posts.indexOf(existingPost)
+&nbsp;            posts[index] = post
+&nbsp;            true
+&nbsp;        } else {
+&nbsp;            false
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    fun removePostById(postId: Int): Boolean {
+&nbsp;        val existingPost = posts.find { it.id == postId }
+&nbsp;        return if (existingPost != null) {
+&nbsp;            posts.remove(existingPost)
+&nbsp;            true
+&nbsp;        } else {
+&nbsp;            false
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    fun getPostById(postId: Int): Post? {
+&nbsp;        return posts.find { it.id == postId }
+&nbsp;    }
+&nbsp;
+&nbsp;    fun getAllPosts(): List&lt;Post&gt; {
+&nbsp;        return posts.toList()
+&nbsp;    }
+&nbsp;
+&nbsp;    fun getPostsCount(): Int {
+&nbsp;        return posts.size
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;fun main() {
+&nbsp;    // Создаем объект WallService
+<b class="nc">&nbsp;    val wallService = WallService()</b>
+&nbsp;
+&nbsp;    // Создаем несколько постов с датами в 2023 году
+<b class="nc">&nbsp;    val post1 = Post(</b>
+<b class="nc">&nbsp;        id = 1,</b>
+<b class="nc">&nbsp;        date = 1672406400, // 30 июня 2023 года в формате unixtime</b>
+<b class="nc">&nbsp;        text = &quot;Привет, мир!&quot;,</b>
+<b class="nc">&nbsp;        comments = Comments(count = 5, can_post = 1, groups_can_post = true, can_close = false, can_open = true),</b>
+<b class="nc">&nbsp;        copyright = Copyright(id = 123, link = null, name = &quot;OpenAI&quot;, type = &quot;Company&quot;),</b>
+<b class="nc">&nbsp;        likes = Likes(count = 10, user_likes = 1, can_like = 0, can_publish = 1),</b>
+<b class="nc">&nbsp;        reposts = Reposts(count = 2, user_reposted = 0),</b>
+<b class="nc">&nbsp;        views = Views(count = 100)</b>
+&nbsp;    )
+&nbsp;
+<b class="nc">&nbsp;    val post2 = Post(</b>
+<b class="nc">&nbsp;        id = 2,</b>
+<b class="nc">&nbsp;        date = 1672492800, // 1 июля 2023 года в формате unixtime</b>
+<b class="nc">&nbsp;        text = &quot;Какой замечательный день!&quot;,</b>
+<b class="nc">&nbsp;        comments = Comments(count = 3, can_post = 1, groups_can_post = true, can_close = false, can_open = true),</b>
+<b class="nc">&nbsp;        copyright = Copyright(id = 456, link = null, name = &quot;ChatGPT&quot;, type = &quot;AI Model&quot;),</b>
+<b class="nc">&nbsp;        likes = Likes(count = 15, user_likes = 0, can_like = 1, can_publish = 1),</b>
+<b class="nc">&nbsp;        reposts = Reposts(count = 1, user_reposted = 1),</b>
+<b class="nc">&nbsp;        views = Views(count = 50)</b>
+&nbsp;    )
+&nbsp;
+&nbsp;    // Добавляем посты в WallService
+<b class="nc">&nbsp;    wallService.addPost(post1)</b>
+<b class="nc">&nbsp;    wallService.addPost(post2)</b>
+&nbsp;
+&nbsp;    // Получаем все посты и выводим их на экран
+<b class="nc">&nbsp;    val allPosts = wallService.getAllPosts()</b>
+<b class="nc">&nbsp;    println(&quot;Список всех постов:&quot;)</b>
+<b class="nc">&nbsp;    for (post in allPosts) {</b>
+<b class="nc">&nbsp;        println(&quot;ID: ${post.id}, Текст: ${post.text}, Лайки: ${post.likes.count}, Комментарии: ${post.comments.count}&quot;)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Получаем и обновляем пост по ID
+<b class="nc">&nbsp;    val postIdToUpdate = 1</b>
+<b class="nc">&nbsp;    val postToUpdate = wallService.getPostById(postIdToUpdate)</b>
+<b class="nc">&nbsp;    if (postToUpdate != null) {</b>
+<b class="nc">&nbsp;        val updatedPost = postToUpdate.copy(text = &quot;Обновленный текст поста&quot;)</b>
+<b class="nc">&nbsp;        wallService.updatePost(updatedPost)</b>
+<b class="nc">&nbsp;        println(&quot;Пост с ID $postIdToUpdate обновлен.&quot;)</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;        println(&quot;Пост с ID $postIdToUpdate не найден.&quot;)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Удаляем пост по ID
+<b class="nc">&nbsp;    val postIdToRemove = 2</b>
+<b class="nc">&nbsp;    val isRemoved = wallService.removePostById(postIdToRemove)</b>
+<b class="nc">&nbsp;    if (isRemoved) {</b>
+<b class="nc">&nbsp;        println(&quot;Пост с ID $postIdToRemove удален.&quot;)</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;        println(&quot;Пост с ID $postIdToRemove не найден.&quot;)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Выводим общее количество постов
+<b class="nc">&nbsp;    val postsCount = wallService.getPostsCount()</b>
+<b class="nc">&nbsp;    println(&quot;Общее количество постов: $postsCount&quot;)</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-07-28 18:16</div>
+</div>
+</body>
+</html>
