@@ -87,10 +87,10 @@ fun main() {
     // Создаем объект WallService
     val wallService = WallService()
 
-    // Создаем несколько постов с датами в 2023 году
+
     val post1 = Post(
         id = 1,
-        date = 1672406400, // 30 июня 2023 года в формате unixtime
+        date = 1672406400,
         text = "Привет, мир!",
         comments = Comments(count = 5, can_post = 1, groups_can_post = true, can_close = false, can_open = true),
         copyright = Copyright(id = 123, link = null, name = "OpenAI", type = "Company"),
@@ -101,7 +101,7 @@ fun main() {
 
     val post2 = Post(
         id = 2,
-        date = 1672492800, // 1 июля 2023 года в формате unixtime
+        date = 1672492800,
         text = "Какой замечательный день!",
         comments = Comments(count = 3, can_post = 1, groups_can_post = true, can_close = false, can_open = true),
         copyright = Copyright(id = 456, link = null, name = "ChatGPT", type = "AI Model"),
