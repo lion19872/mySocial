@@ -1,27 +1,9 @@
-data class Post(
-    val id: Int,
-    val date: Int,
-    val text: String,
-    val comments: Comments,
-    val copyright: Copyright,
-    val likes: Likes,
-    val reposts: Reposts,
-    val views: Views
-)
-
 data class Comments(
     val count: Int,
     val canPost: Int,
     val groupsCanPost: Boolean,
     val canClose: Boolean,
     val canOpen: Boolean
-)
-
-data class Copyright(
-    val id: Int,
-    val link: String?,
-    val name: String?,
-    val type: String?
 )
 
 data class Likes(
@@ -38,6 +20,29 @@ data class Reposts(
 
 data class Views(
     val count: Int
+)
+
+abstract class Attachment(val type: String)
+
+data class PhotoAttachment(val url: String) : Attachment("photo")
+
+data class LinkAttachment(val title: String, val url: String) : Attachment("link")
+
+data class VideoAttachment(val title: String, val url: String) : Attachment("video")
+
+data class AudioAttachment(val artist: String, val title: String, val url: String) : Attachment("audio")
+
+data class DocAttachment(val title: String, val url: String) : Attachment("doc")
+
+data class Post(
+    val id: Int,
+    val date: Int,
+    val text: String,
+    val comments: Comments,
+    val attachments: List<Attachment>, // Добавлен массив attachments
+    val likes: Likes,
+    val reposts: Reposts,
+    val views: Views
 )
 
 class WallService {
@@ -87,12 +92,18 @@ fun main() {
     // Создаем объект WallService
     val wallService = WallService()
 
+    val photoAttachment = PhotoAttachment(url = "https://example.com/photo.jpg")
+    val linkAttachment = LinkAttachment(title = "Example Link", url = "https://example.com")
+    val videoAttachment = VideoAttachment(title = "Example Video", url = "https://example.com/video.mp4")
+    val audioAttachment = AudioAttachment(artist = "Artist", title = "Song", url = "https://example.com/song.mp3")
+    val docAttachment = DocAttachment(title = "Example Document", url = "https://example.com/document.pdf")
+
     val post1 = Post(
         id = 1,
         date = 1672406400,
         text = "Привет, мир!",
         comments = Comments(count = 5, canPost = 1, groupsCanPost = true, canClose = false, canOpen = true),
-        copyright = Copyright(id = 123, link = null, name = "OpenAI", type = "Company"),
+        attachments = listOf(photoAttachment, linkAttachment),
         likes = Likes(count = 10, userLikes = 1, canLike = 0, canPublish = 1),
         reposts = Reposts(count = 2, userReposted = 0),
         views = Views(count = 100)
@@ -103,7 +114,7 @@ fun main() {
         date = 1672492800,
         text = "Какой замечательный день!",
         comments = Comments(count = 3, canPost = 1, groupsCanPost = true, canClose = false, canOpen = true),
-        copyright = Copyright(id = 456, link = null, name = "ChatGPT", type = "AI Model"),
+        attachments = listOf(videoAttachment, audioAttachment, docAttachment),
         likes = Likes(count = 15, userLikes = 0, canLike = 1, canPublish = 1),
         reposts = Reposts(count = 1, userReposted = 1),
         views = Views(count = 50)
