@@ -79,14 +79,14 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    val id: Int,
 &nbsp;    val date: Int,
 &nbsp;    val text: String,
-&nbsp;    val comments: Comments,
+&nbsp;    val comment: comment,
 &nbsp;    val copyright: Copyright,
 &nbsp;    val likes: Likes,
 &nbsp;    val reposts: Reposts,
 &nbsp;    val views: Views
 &nbsp;)
 &nbsp;
-&nbsp;data class Comments(
+&nbsp;data class comment(
 &nbsp;    val count: Int,
 &nbsp;    val can_post: Int,
 &nbsp;    val groups_can_post: Boolean,
@@ -169,7 +169,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;        id = 1,</b>
 <b class="nc">&nbsp;        date = 1672406400, // 30 июня 2023 года в формате unixtime</b>
 <b class="nc">&nbsp;        text = &quot;Привет, мир!&quot;,</b>
-<b class="nc">&nbsp;        comments = Comments(count = 5, can_post = 1, groups_can_post = true, can_close = false, can_open = true),</b>
+<b class="nc">&nbsp;        comment = comment(count = 5, can_post = 1, groups_can_post = true, can_close = false, can_open = true),</b>
 <b class="nc">&nbsp;        copyright = Copyright(id = 123, link = null, name = &quot;OpenAI&quot;, type = &quot;Company&quot;),</b>
 <b class="nc">&nbsp;        likes = Likes(count = 10, user_likes = 1, can_like = 0, can_publish = 1),</b>
 <b class="nc">&nbsp;        reposts = Reposts(count = 2, user_reposted = 0),</b>
@@ -180,7 +180,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;        id = 2,</b>
 <b class="nc">&nbsp;        date = 1672492800, // 1 июля 2023 года в формате unixtime</b>
 <b class="nc">&nbsp;        text = &quot;Какой замечательный день!&quot;,</b>
-<b class="nc">&nbsp;        comments = Comments(count = 3, can_post = 1, groups_can_post = true, can_close = false, can_open = true),</b>
+<b class="nc">&nbsp;        comment = comment(count = 3, can_post = 1, groups_can_post = true, can_close = false, can_open = true),</b>
 <b class="nc">&nbsp;        copyright = Copyright(id = 456, link = null, name = &quot;ChatGPT&quot;, type = &quot;AI Model&quot;),</b>
 <b class="nc">&nbsp;        likes = Likes(count = 15, user_likes = 0, can_like = 1, can_publish = 1),</b>
 <b class="nc">&nbsp;        reposts = Reposts(count = 1, user_reposted = 1),</b>
@@ -195,7 +195,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;    val allPosts = wallService.getAllPosts()</b>
 <b class="nc">&nbsp;    println(&quot;Список всех постов:&quot;)</b>
 <b class="nc">&nbsp;    for (post in allPosts) {</b>
-<b class="nc">&nbsp;        println(&quot;ID: ${post.id}, Текст: ${post.text}, Лайки: ${post.likes.count}, Комментарии: ${post.comments.count}&quot;)</b>
+<b class="nc">&nbsp;        println(&quot;ID: ${post.id}, Текст: ${post.text}, Лайки: ${post.likes.count}, Комментарии: ${post.comment.count}&quot;)</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    // Получаем и обновляем пост по ID
