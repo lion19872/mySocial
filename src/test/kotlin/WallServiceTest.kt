@@ -1,6 +1,7 @@
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 
 class WallServiceTest {
@@ -11,10 +12,10 @@ class WallServiceTest {
             id = 1,
             date = 1672406400,
             text = "Test post",
-            comments = Comments(count = 0, can_post = 1, groups_can_post = true, can_close = false, can_open = true),
+            comments = Comments(count = 0, canPost = 1, groupsCanPost = true, canClose = false, canOpen = true),
             copyright = Copyright(id = 123, link = null, name = "Test Company", type = "Company"),
-            likes = Likes(count = 0, user_likes = 0, can_like = 1, can_publish = 1),
-            reposts = Reposts(count = 0, user_reposted = 0),
+            likes = Likes(count = 0, userLikes = 0, canLike = 1, canPublish = 1),
+            reposts = Reposts(count = 0, userReposted = 0),
             views = Views(count = 0)
         )
 
@@ -31,10 +32,10 @@ class WallServiceTest {
             id = 1,
             date = 1672406400,
             text = "Test post",
-            comments = Comments(count = 0, can_post = 1, groups_can_post = true, can_close = false, can_open = true),
+            comments = Comments(count = 0, canPost = 1, groupsCanPost = true, canClose = false, canOpen = true),
             copyright = Copyright(id = 123, link = null, name = "Test Company", type = "Company"),
-            likes = Likes(count = 0, user_likes = 0, can_like = 1, can_publish = 1),
-            reposts = Reposts(count = 0, user_reposted = 0),
+            likes = Likes(count = 0, userLikes = 0, canLike = 1, canPublish = 1),
+            reposts = Reposts(count = 0, userReposted = 0),
             views = Views(count = 0)
         )
 
@@ -54,10 +55,10 @@ class WallServiceTest {
             id = 1,
             date = 1672406400,
             text = "Test post",
-            comments = Comments(count = 0, can_post = 1, groups_can_post = true, can_close = false, can_open = true),
+            comments = Comments(count = 0, canPost = 1, groupsCanPost = true, canClose = false, canOpen = true),
             copyright = Copyright(id = 123, link = null, name = "Test Company", type = "Company"),
-            likes = Likes(count = 0, user_likes = 0, can_like = 1, can_publish = 1),
-            reposts = Reposts(count = 0, user_reposted = 0),
+            likes = Likes(count = 0, userLikes = 0, canLike = 1, canPublish = 1),
+            reposts = Reposts(count = 0, userReposted = 0),
             views = Views(count = 0)
         )
 
@@ -68,5 +69,37 @@ class WallServiceTest {
         assertTrue(isRemoved)
         assertNull(wallService.getPostById(1))
         assertEquals(0, wallService.getPostsCount())
+    }
+
+    @Test
+    fun testUnsuccessfulUpdatePost() {
+        val wallService = WallService()
+        val post = Post(
+            id = 1,
+            date = 1672406400,
+            text = "Test post",
+            comments = Comments(count = 0, canPost = 1, groupsCanPost = true, canClose = false, canOpen = true),
+            copyright = Copyright(id = 123, link = null, name = "Test Company", type = "Company"),
+            likes = Likes(count = 0, userLikes = 0, canLike = 1, canPublish = 1),
+            reposts = Reposts(count = 0, userReposted = 0),
+            views = Views(count = 0)
+        )
+
+        wallService.addPost(post)
+
+        val nonExistingPost = Post(
+            id = 2,
+            date = 1672406400,
+            text = "Non-existing post",
+            comments = Comments(count = 0, canPost = 1, groupsCanPost = true, canClose = false, canOpen = true),
+            copyright = Copyright(id = 123, link = null, name = "Test Company", type = "Company"),
+            likes = Likes(count = 0, userLikes = 0, canLike = 1, canPublish = 1),
+            reposts = Reposts(count = 0, userReposted = 0),
+            views = Views(count = 0)
+        )
+
+        val isUpdated = wallService.updatePost(nonExistingPost)
+
+        assertFalse(isUpdated)
     }
 }
