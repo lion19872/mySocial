@@ -1,48 +1,43 @@
-data class Comments(
-    val count: Int,
-    val canPost: Int,
-    val groupsCanPost: Boolean,
-    val canClose: Boolean,
-    val canOpen: Boolean
-)
-
-data class Likes(
-    val count: Int,
-    val userLikes: Int,
-    val canLike: Int,
-    val canPublish: Int
-)
-
-data class Reposts(
-    val count: Int,
-    val userReposted: Int
-)
-
-data class Views(
-    val count: Int
-)
-
-abstract class Attachment(val type: String)
-
-data class PhotoAttachment(val url: String) : Attachment("photo")
-
-data class LinkAttachment(val title: String, val url: String) : Attachment("link")
-
-data class VideoAttachment(val title: String, val url: String) : Attachment("video")
-
-data class AudioAttachment(val artist: String, val title: String, val url: String) : Attachment("audio")
-
-data class DocAttachment(val title: String, val url: String) : Attachment("doc")
-
 data class Post(
     val id: Int,
     val date: Int,
     val text: String,
     val comments: Comments,
-    val attachments: List<Attachment>, // Добавлен массив attachments
+    val copyright: Copyright,
     val likes: Likes,
     val reposts: Reposts,
     val views: Views
+)
+
+data class Comments(
+    val count: Int,
+    val can_post: Int,
+    val groups_can_post: Boolean,
+    val can_close: Boolean,
+    val can_open: Boolean
+)
+
+data class Copyright(
+    val id: Int,
+    val link: String?,
+    val name: String?,
+    val type: String?
+)
+
+data class Likes(
+    val count: Int,
+    val user_likes: Int,
+    val can_like: Int,
+    val can_publish: Int
+)
+
+data class Reposts(
+    val count: Int,
+    val user_reposted: Int
+)
+
+data class Views(
+    val count: Int
 )
 
 class WallService {
@@ -57,8 +52,16 @@ class WallService {
     fun updatePost(post: Post): Boolean {
         val existingPost = posts.find { it.id == post.id }
         return if (existingPost != null) {
+            val updatedPost = existingPost.copy(
+                text = post.text,
+                comments = post.comments,
+                copyright = post.copyright,
+                likes = post.likes,
+                reposts = post.reposts,
+                views = post.views
+            )
             val index = posts.indexOf(existingPost)
-            posts[index] = post
+            posts[index] = updatedPost
             true
         } else {
             false
@@ -89,23 +92,16 @@ class WallService {
 }
 
 fun main() {
-    // Создаем объект WallService
     val wallService = WallService()
-
-    val photoAttachment = PhotoAttachment(url = "https://example.com/photo.jpg")
-    val linkAttachment = LinkAttachment(title = "Example Link", url = "https://example.com")
-    val videoAttachment = VideoAttachment(title = "Example Video", url = "https://example.com/video.mp4")
-    val audioAttachment = AudioAttachment(artist = "Artist", title = "Song", url = "https://example.com/song.mp3")
-    val docAttachment = DocAttachment(title = "Example Document", url = "https://example.com/document.pdf")
 
     val post1 = Post(
         id = 1,
         date = 1672406400,
         text = "Привет, мир!",
-        comments = Comments(count = 5, canPost = 1, groupsCanPost = true, canClose = false, canOpen = true),
-        attachments = listOf(photoAttachment, linkAttachment),
-        likes = Likes(count = 10, userLikes = 1, canLike = 0, canPublish = 1),
-        reposts = Reposts(count = 2, userReposted = 0),
+        comments = Comments(count = 5, can_post = 1, groups_can_post = true, can_close = false, can_open = true),
+        copyright = Copyright(id = 123, link = null, name = "OpenAI", type = "Company"),
+        likes = Likes(count = 10, user_likes = 1, can_like = 0, can_publish = 1),
+        reposts = Reposts(count = 2, user_reposted = 0),
         views = Views(count = 100)
     )
 
@@ -113,25 +109,22 @@ fun main() {
         id = 2,
         date = 1672492800,
         text = "Какой замечательный день!",
-        comments = Comments(count = 3, canPost = 1, groupsCanPost = true, canClose = false, canOpen = true),
-        attachments = listOf(videoAttachment, audioAttachment, docAttachment),
-        likes = Likes(count = 15, userLikes = 0, canLike = 1, canPublish = 1),
-        reposts = Reposts(count = 1, userReposted = 1),
+        comments = Comments(count = 3, can_post = 1, groups_can_post = true, can_close = false, can_open = true),
+        copyright = Copyright(id = 456, link = null, name = "ChatGPT", type = "AI Model"),
+        likes = Likes(count = 15, user_likes = 0, can_like = 1, can_publish = 1),
+        reposts = Reposts(count = 1, user_reposted = 1),
         views = Views(count = 50)
     )
 
-    // Добавляем посты в WallService
     wallService.addPost(post1)
     wallService.addPost(post2)
 
-    // Получаем все посты и выводим их на экран
     val allPosts = wallService.getAllPosts()
     println("Список всех постов:")
     for (post in allPosts) {
         println("ID: ${post.id}, Текст: ${post.text}, Лайки: ${post.likes.count}, Комментарии: ${post.comments.count}")
     }
 
-    // Получаем и обновляем пост по ID
     val postIdToUpdate = 1
     val postToUpdate = wallService.getPostById(postIdToUpdate)
     if (postToUpdate != null) {
@@ -142,7 +135,6 @@ fun main() {
         println("Пост с ID $postIdToUpdate не найден.")
     }
 
-    // Удаляем пост по ID
     val postIdToRemove = 2
     val isRemoved = wallService.removePostById(postIdToRemove)
     if (isRemoved) {
@@ -151,7 +143,6 @@ fun main() {
         println("Пост с ID $postIdToRemove не найден.")
     }
 
-    // Выводим общее количество постов
     val postsCount = wallService.getPostsCount()
     println("Общее количество постов: $postsCount")
 }
