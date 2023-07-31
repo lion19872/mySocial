@@ -2,19 +2,20 @@ data class Post(
     val id: Int,
     val date: Int,
     val text: String,
-    val comments: Comments,
+    val comment: Comment,
     val copyright: Copyright,
     val likes: Likes,
     val reposts: Reposts,
     val views: Views
 )
 
-data class Comments(
-    val count: Int,
-    val canPost: Int,
-    val groupsCanPost: Boolean,
-    val canClose: Boolean,
-    val canOpen: Boolean
+data class Comment(
+    val id: Int,
+    val from_id: Int,
+    val date: Int,
+    val text: String,
+    val reply_to_user: Int = 0,
+    val reply_to_comment: Int = 0
 )
 
 data class Copyright(
@@ -41,11 +42,16 @@ data class Views(
 )
 
 class WallService {
-    private val posts = mutableListOf<Post>()
+    private var posts = emptyArray<Post>()
+    private var comments = emptyArray<Comment>()
+
+    private fun generateNewCommentId(): Int {
+        return comments.maxByOrNull { it.id }?.id?.plus(1) ?: 1
+    }
 
     fun addPost(post: Post): Post {
         val newPost = post.copy(id = if (posts.isEmpty()) 1 else posts.maxByOrNull { it.id }!!.id + 1)
-        posts.add(newPost)
+        posts = posts.plus(newPost)
         return newPost
     }
 
@@ -54,7 +60,7 @@ class WallService {
         return if (existingPost != null) {
             val updatedPost = existingPost.copy(
                 text = post.text,
-                comments = post.comments,
+                comment = post.comment,
                 copyright = post.copyright,
                 likes = post.likes,
                 reposts = post.reposts,
@@ -71,7 +77,7 @@ class WallService {
     fun removePostById(postId: Int): Boolean {
         val existingPost = posts.find { it.id == postId }
         return if (existingPost != null) {
-            posts.remove(existingPost)
+            posts = posts.filterNot { it.id == postId }.toTypedArray()
             true
         } else {
             false
@@ -79,7 +85,7 @@ class WallService {
     }
 
     fun getPostById(postId: Int): Post? {
-        return posts.find { it.id == postId }
+        return posts.find { it.id == postId } ?: throw PostNotFoundException("Пост с ID $postId не найден.")
     }
 
     fun getAllPosts(): List<Post> {
@@ -89,7 +95,19 @@ class WallService {
     fun getPostsCount(): Int {
         return posts.size
     }
+    fun createComment(postId: Int, comment: Comment): Comment {
+        val post = posts.find { it.id == postId }
+        if (post != null) {
+            val newComment = comment.copy(id = generateNewCommentId(), from_id = comment.from_id, date = comment.date)
+            comments = comments.plus(newComment)
+            return newComment
+        } else {
+            throw PostNotFoundException("Пост с ID $postId не найден.")
+        }
+    }
 }
+
+class PostNotFoundException(message: String) : Exception(message)
 
 fun main() {
     val wallService = WallService()
@@ -98,8 +116,13 @@ fun main() {
         id = 1,
         date = 1672406400,
         text = "Привет, мир!",
-        comments = Comments(count = 5, canPost = 1, groupsCanPost = true, canClose = false, canOpen = true),
-        copyright = Copyright(id = 123, link = null, name = "OpenAI", type = "Company"),
+        comment = Comment(id = 1,
+            from_id = 123,
+            date = 1672406401,
+            text = "Комментарий к посту 1",
+            reply_to_user = 0,
+            reply_to_comment = 0),
+        copyright = Copyright(id = 123, link = null, name = "Dmitry Levinski", type = "Author"),
         likes = Likes(count = 10, userLikes = 1, canLike = 0, canPublish = 1),
         reposts = Reposts(count = 2, userReposted = 0),
         views = Views(count = 100)
@@ -109,8 +132,13 @@ fun main() {
         id = 2,
         date = 1672492800,
         text = "Какой замечательный день!",
-        comments = Comments(count = 3, canPost = 1, groupsCanPost = true, canClose = false, canOpen = true),
-        copyright = Copyright(id = 456, link = null, name = "ChatGPT", type = "AI Model"),
+        comment = Comment( id = 2,
+            from_id = 456,
+            date = 1672492801,
+            text = "Комментарий к посту 2",
+            reply_to_user = 0,
+            reply_to_comment = 0),
+        copyright = Copyright(id = 456, link = null, name = "Dmitry Levinski", type = "Author"),
         likes = Likes(count = 15, userLikes = 0, canLike = 1, canPublish = 1),
         reposts = Reposts(count = 1, userReposted = 1),
         views = Views(count = 50)
@@ -122,7 +150,7 @@ fun main() {
     val allPosts = wallService.getAllPosts()
     println("Список всех постов:")
     for (post in allPosts) {
-        println("ID: ${post.id}, Текст: ${post.text}, Лайки: ${post.likes.count}, Комментарии: ${post.comments.count}")
+        println("ID: ${post.id}, Текст: ${post.text}, Лайки: ${post.likes.count}, Комментарии: ${post.comment.text}")
     }
 
     val postIdToUpdate = 1
@@ -145,4 +173,11 @@ fun main() {
 
     val postsCount = wallService.getPostsCount()
     println("Общее количество постов: $postsCount")
+
+    // Adding comments
+    val comment1 = Comment(id = 1, from_id = 123, date = 1672406401, text = "Комментарий к посту 1")
+    wallService.createComment(1, comment1)
+
+    val comment2 = Comment(id = 2, from_id = 456, date = 1672492801, text = "Комментарий к посту 2")
+    wallService.createComment(2, comment2)
 }
