@@ -85,7 +85,7 @@ class WallService {
     }
 
     fun getPostById(postId: Int): Post? {
-        return posts.find { it.id == postId } ?: throw PostNotFoundException("Пост с ID $postId не найден.")
+        return posts.find { it.id == postId }
     }
 
     fun getAllPosts(): List<Post> {
