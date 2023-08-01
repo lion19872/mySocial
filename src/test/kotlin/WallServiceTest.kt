@@ -67,6 +67,7 @@ class WallServiceTest {
         assertNull(wallService.getPostById(1))
         assertEquals(0, wallService.getPostsCount())
     }
+
     @Test
     fun testUnsuccessfulUpdatePost() {
         val wallService = WallService()
@@ -99,4 +100,29 @@ class WallServiceTest {
         assertFalse(isUpdated)
     }
 
+    @Test
+    fun testCreateComment_Successful() {
+        val wallService = WallService()
+        val postId = 1
+        wallService.addPost(Post(id = postId, date = System.currentTimeMillis(), text = "Test Post", comments = Comments(count = 3, can_post = 1, groups_can_post = true, can_close = false, can_open = true),
+            copyright = Copyright(id = 456, link = null, name = "Dmitry Levinski", type = "Author"),
+            likes = Likes(count = 15, user_likes = 0, can_like = 1, can_publish = 1),
+            reposts = Reposts(count = 1, user_reposted = 1),
+            views = Views(count = 50)))
+
+        val commentText = "This is a test comment"
+        val comment = wallService.createComment(postId, commentText)
+
+        assertEquals(commentText, comment.text)
+    }
+
+    @Test
+    fun testCreateComment_ThrowsPostNotFoundException() {
+        val wallService = WallService()
+        val postId = 1
+        val commentText = "This is a test comment"
+        assertThrows(PostNotFoundException::class.java) {
+            wallService.createComment(postId, commentText)
+        }
+    }
 }

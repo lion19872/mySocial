@@ -2,7 +2,7 @@ data class Post(
     val id: Int,
     val date: Long,
     val text: String?,
-    val comments: Comments?,
+    var comments: Comments?,
     val copyright: Copyright?,
     val likes: Likes?,
     val reposts: Reposts?,
@@ -59,30 +59,23 @@ data class Post(
 }
 
 data class Comments(
-    val count: Int?,
-    val can_post: Int?,
-    val groups_can_post: Boolean?,
-    val can_close: Boolean?,
-    val can_open: Boolean?
+    val count: Int?, val can_post: Int?, val groups_can_post: Boolean?, val can_close: Boolean?, val can_open: Boolean?
+)
+
+data class Comment(
+    val id: Int, val postId: Int, val text: String, val date: Long
 )
 
 data class Copyright(
-    val id: Int?,
-    val link: String?,
-    val name: String?,
-    val type: String?
+    val id: Int?, val link: String?, val name: String?, val type: String?
 )
 
 data class Likes(
-    val count: Int?,
-    val user_likes: Int?,
-    val can_like: Int?,
-    val can_publish: Int?
+    val count: Int?, val user_likes: Int?, val can_like: Int?, val can_publish: Int?
 )
 
 data class Reposts(
-    val count: Int?,
-    val user_reposted: Int?
+    val count: Int?, val user_reposted: Int?
 )
 
 data class Views(
@@ -94,8 +87,7 @@ data class PostSource(
 )
 
 data class Geo(
-    val coordinates: String?,
-    val place: Place?
+    val coordinates: String?, val place: Place?
 )
 
 data class Place(
@@ -117,14 +109,25 @@ abstract class Attachment(val type: String)
 data class PhotoAttachment(val photo: Photo) : Attachment("photo")
 
 data class Photo(
-    val id: Int,
-    val ownerId: Int,
-    val photo130: String,
-    val photo604: String
+    val id: Int, val ownerId: Int, val photo130: String, val photo604: String
 )
 
 class WallService {
     private val posts = mutableListOf<Post>()
+    private var commentIdCounter = 0
+
+    fun createComment(postId: Int, commentText: String): Comment {
+        val post = posts.find { it.id == postId } ?: throw PostNotFoundException("Post with ID $postId not found")
+
+        val newCommentId = ++commentIdCounter
+        val newComment = Comment(newCommentId, postId, commentText, System.currentTimeMillis())
+
+        // Add the new comment to the list of comments for the post
+        val updatedComments = post.comments?.copy(count = (post.comments?.count ?: 0) + 1)
+        post.comments = updatedComments
+
+        return newComment
+    }
 
     fun addPost(post: Post): Post {
         val newPost = post.copy(id = if (posts.isEmpty()) 1 else (posts.maxByOrNull { it.id }?.id ?: 0) + 1)
@@ -135,6 +138,8 @@ class WallService {
     fun updatePost(post: Post): Boolean {
         val existingPost = posts.find { it.id == post.id }
         return if (existingPost != null) {
+            val existingComments = existingPost.comments
+
             val updatedPost = existingPost.copy(
                 text = post.text,
                 comments = post.comments,
@@ -143,6 +148,10 @@ class WallService {
                 reposts = post.reposts,
                 views = post.views
             )
+
+            // Restore the original comments value
+            updatedPost.comments = existingComments
+
             val index = posts.indexOf(existingPost)
             posts[index] = updatedPost
             true
@@ -185,7 +194,7 @@ fun main() {
         copyright = Copyright(id = 123, link = null, name = "Dmitry Levinski", type = "Author"),
         likes = Likes(count = 10, user_likes = 1, can_like = 0, can_publish = 1),
         reposts = Reposts(count = 2, user_reposted = 0),
-        views = Views(count = 100)
+        views = Views(count = 100),
     )
 
     val post2 = Post(
@@ -204,10 +213,10 @@ fun main() {
         date = 1672585600L,
         text = "Сегодня посетил занятие по программированию. Обсуждали интересные алгоритмы и практиковались в написании кода на Kotlin. Было продуктивно! #программирование #обучение",
         comments = Comments(count = 7, can_post = 1, groups_can_post = true, can_close = false, can_open = true),
-    copyright = Copyright(id = 789, link = null, name = "Dmitry Levinski", type = "Author"),
-    likes = Likes(count = 8, user_likes = 1, can_like = 0, can_publish = 1),
-    reposts = Reposts(count = 0, user_reposted = 0),
-    views = Views(count = 70)
+        copyright = Copyright(id = 789, link = null, name = "Dmitry Levinski", type = "Author"),
+        likes = Likes(count = 8, user_likes = 1, can_like = 0, can_publish = 1),
+        reposts = Reposts(count = 0, user_reposted = 0),
+        views = Views(count = 70)
     )
 
     val post4 = Post(
@@ -225,6 +234,7 @@ fun main() {
     wallService.addPost(post2)
     wallService.addPost(post3)
     wallService.addPost(post4)
+
 
     val allPosts = wallService.getAllPosts()
     println("Список всех постов:")
@@ -252,4 +262,7 @@ fun main() {
 
     val postsCount = wallService.getPostsCount()
     println("Общее количество постов: $postsCount")
+
 }
+
+class PostNotFoundException(message: String) : Exception(message)
